@@ -98,171 +98,69 @@ main <- function(portfolio, indicators, dem_url){
   )
 }
 
+# Create larger datasets
+
+# With 60 assets
+many_aois <- bind_rows(replicate(10, aois, simplify = FALSE))
+many_aois$id <- 1:nrow(many_aois)
+
+# With 600 assets
+very_many_aois <- bind_rows(replicate(100, aois, simplify = FALSE))
+very_many_aois$id <- 1:nrow(very_many_aois)
+# user   system  elapsed 
+# 189.744   48.133 1480.693
+
+# Sequential ------------------------------------------------------
 
 plan(sequential)
 system.time(out <- main(aois, c("dem", "tri"), dem_url))
 # user  system elapsed 
 # 2.547   0.650  19.507 
 
-plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 4)))
-system.time(out <- main(aois, c("dem", "tri"), dem_url))
-# user  system elapsed 
-# 2.559   0.332  36.415 
-
-
-# Now let's try with more assets
-many_aois <- bind_rows(replicate(10, aois, simplify = FALSE))
-many_aois$id <- 1:nrow(many_aois)
-
 plan(sequential)
 system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
 # user  system elapsed 
 # 21.570   5.551 191.902 
 
-plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 4)))
+plan(sequential)
+system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
+
+# 4 Workers -----------------------------------------------------------
+
+## cluster 2x2 ---------------------------------
+
+# very small dataset
+plan(sequential)
+plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 2)))
+system.time(out <- main(aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 1.623   0.095  26.197 
+
+# small dataset
+plan(sequential)
+plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 2)))
 system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
 # user  system elapsed 
-# 4.689   0.360  57.267 
+# 8.049   5.468  65.004 
 
-## TWEAK PLAN ---------------------------------
+# larger dataset
+plan(sequential)
+plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 2)))
+system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
+
+## Cluster 4 --------------------------------------
 
 plan(sequential)
-plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 4)))
-system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+plan(cluster, workers = 4)
+system.time(out <- main(aois, c("dem", "tri"), dem_url))
 # user  system elapsed 
-# 5.589   0.565  67.473 
-
-plan(sequential)
-plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 2)))
-system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
-# user  system elapsed 
-# 5.983   0.600  73.072 
+# 1.009   0.053  19.999 
 
 plan(sequential)
 plan(cluster, workers = 4)
 system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
 # user  system elapsed 
 # 9.946   0.926 109.158 
-
-plan(sequential)
-plan(cluster, workers = 8)
-system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
-# user  system elapsed 
-# 6.725   0.770  74.830 
-
-plan(sequential)
-plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 8)))
-system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
-# user  system elapsed 
-# 6.459   0.846  70.975
-
-plan(sequential)
-plan(list(tweak(multisession, workers = 4), tweak(multisession, workers = 4)))
-system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
-# user  system elapsed 
-# 5.064   0.410  61.576 
-
-## END TWEAK PLAN --------------------------------
-
-# Now let's try with more assets
-very_many_aois <- bind_rows(replicate(100, aois, simplify = FALSE))
-very_many_aois$id <- 1:nrow(very_many_aois)
-
-plan(sequential)
-plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 4)))
-system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
-# user  system elapsed 
-# 29.505   2.516 311.656
-
-# Now let's try with more assets
-very_many_aois <- bind_rows(replicate(100, aois, simplify = FALSE))
-very_many_aois$id <- 1:nrow(very_many_aois)
-
-plan(sequential)
-plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 4)))
-system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
-# user  system elapsed 
-# 29.505   2.516 311.656
-
-## CONTINUE TESTS ------------------------------------------------------
-
-# Start with an already tested config to check if perfs are stable
-# with a new pod
-plan(sequential)
-plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 8)))
-system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
-# user  system elapsed 
-# 5.354   0.443  70.558 
-
-# larger dataset
-plan(sequential)
-plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 8)))
-system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
-# user  system elapsed 
-# 61.611   4.638 807.943 
-
-# Smaller dataset
-plan(sequential)
-plan(list(tweak(cluster, workers = 3), tweak(cluster, workers = 8)))
-system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
-# user  system elapsed 
-# 5.207   0.453  66.653 
-
-
-# larger dataset
-plan(sequential)
-plan(list(tweak(cluster, workers = 3), tweak(cluster, workers = 8)))
-system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
-# user  system elapsed 
-# 27.404   2.322 310.140 
-
-# Smaller dataset
-plan(sequential)
-plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 6)))
-system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
-# user  system elapsed 
-# 4.118   0.364  56.342
-
-# Very small dataset
-plan(sequential)
-plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 6)))
-system.time(out <- main(aois, c("dem", "tri"), dem_url))
-
-# Small dataset
-plan(sequential)
-plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 6)))
-system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
-
-# larger dataset
-plan(sequential)
-plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 6)))
-system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
-# user  system elapsed 
-# 37.542   3.022 442.073
-
-
-# larger dataset
-plan(sequential)
-plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 12)))
-system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
-# user  system elapsed 
-# 20.459   1.965 222.440
-
-## PREVIOUS TESTS WITH LARGER DATASET ----------------------------------
-
-# larger dataset
-plan(sequential)
-plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 4)))
-system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
-# user   system  elapsed 
-# 101.255    8.462 1042.591 
-
-# larger dataset
-plan(sequential)
-plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 2)))
-system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
-# user   system  elapsed 
-# 121.529   11.115 1314.205 
 
 # larger dataset
 plan(sequential)
@@ -271,12 +169,88 @@ system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
 # user  system elapsed 
 # 81.295   6.770 879.906 
 
+
+# 8 workers ---------------------------------------------------------------
+
+## Cluster 2x4 --------------------------------------
+
+plan(sequential)
+plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 4)))
+system.time(out <- main(aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 2.043   0.128  31.238
+
+plan(sequential)
+plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 4)))
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 5.589   0.565  67.473 
+
+# larger dataset
+plan(sequential)
+plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 4)))
+system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
+# user   system  elapsed 
+# 101.255    8.462 1042.591 
+
+## Cluster 4x2 -----------------------------------------
+
+plan(sequential)
+plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 2)))
+system.time(out <- main(aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 1.446   0.211  24.726 
+
+plan(sequential)
+plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 2)))
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 5.983   0.600  73.072 
+
+# larger dataset
+plan(sequential)
+plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 2)))
+system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
+# user   system  elapsed 
+# 121.529   11.115 1314.205 
+
+## Cluster 8 ---------------------------------------
+
+plan(sequential)
+plan(cluster, workers = 8)
+system.time(out <- main(aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 1.334   0.132  24.333 
+
+plan(sequential)
+plan(cluster, workers = 8)
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 6.725   0.770  74.830 
+
 # larger dataset
 plan(sequential)
 plan(cluster, workers = 8)
 system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
 # user  system elapsed 
 # 51.439   5.110 567.372 
+
+
+# 8 workers ---------------------------------------------------------------
+
+## Multisession 4x4 --------------------------
+
+plan(sequential)
+plan(list(tweak(multisession, workers = 4), tweak(multisession, workers = 4)))
+system.time(out <- main(aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 2.287   0.238  34.425 
+
+plan(sequential)
+plan(list(tweak(multisession, workers = 4), tweak(multisession, workers = 4)))
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 5.064   0.410  61.576 
 
 # larger dataset
 plan(sequential)
@@ -285,28 +259,154 @@ system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
 # user  system elapsed 
 # 28.309   2.233 317.105
 
+## cluster 4x4 ----------------------------------------
+
+plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 4)))
+system.time(out <- main(aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 2.559   0.332  36.415 
+
+plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 4)))
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 4.689   0.360  57.267 
+
+plan(sequential)
+plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 4)))
+system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 29.505   2.516 311.656
+
+
+## cluster 2x8 ---------------------------------
+
+plan(sequential)
+plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 8)))
+system.time(out <- main(aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 2.830   0.680  41.274
+
+plan(sequential)
+plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 8)))
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 6.459   0.846  70.975
+
+# larger dataset
+plan(sequential)
+plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 8)))
+system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 61.611   4.638 807.943 
+
+## cluster 16 -----------------------
+
+plan(sequential)
+plan(cluster, workers = 16)
+system.time(out <- main(aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 1.152   0.074  21.172 
+
+plan(sequential)
+plan(cluster, workers = 16)
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 5.960   0.548  73.368 
+
 # larger dataset
 plan(sequential)
 plan(cluster, workers = 16)
 system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 65.716   2.881 971.648 
+
+# 24 workers -----------------------------------------------------------
+
+## cluster 3x8 -----------------------------------
+
+plan(sequential)
+plan(list(tweak(cluster, workers = 3), tweak(cluster, workers = 8)))
+system.time(out <- main(aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 3.807   0.274  47.897 
+
+# Smaller dataset
+plan(sequential)
+plan(list(tweak(cluster, workers = 3), tweak(cluster, workers = 8)))
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 5.207   0.453  66.653 
+
+# larger dataset
+plan(sequential)
+plan(list(tweak(cluster, workers = 3), tweak(cluster, workers = 8)))
+system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 27.404   2.322 310.140 
+
+## Cluster 4x6 ------------------------------
+
+# Very small dataset
+plan(sequential)
+plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 6)))
+system.time(out <- main(aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 2.740   0.264  38.223 
+
+# Smaller dataset
+plan(sequential)
+plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 6)))
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 4.118   0.364  56.342
+
+
+# larger dataset
+plan(sequential)
+plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 6)))
+system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 37.542   3.022 442.073
+
+## cluster 2 x 12 ----------------------------------
+
+plan(sequential)
+plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 12)))
+system.time(out <- main(aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 3.501   0.436  43.203 
+
+plan(sequential)
+plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 12)))
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 6.926   0.754  80.899 
+
+# larger dataset
+plan(sequential)
+plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 12)))
+system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 20.459   1.965 222.440
+
+## cluster 24 ------------------------------------------
+
+plan(sequential)
+plan(cluster, workers = 24)
+system.time(out <- main(aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 0.954   0.071  20.891 
+
+plan(sequential)
+plan(cluster, workers = 24)
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 8.095   0.828 102.298 
 
 # larger dataset
 plan(sequential)
 plan(cluster, workers = 24)
 system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 55.393   4.377 810.612
 
-# Back to small numbers
-# very small dataset
-plan(sequential)
-plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 2)))
-system.time(out <- main(aois, c("dem", "tri"), dem_url))
-
-# small dataset
-plan(sequential)
-plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 2)))
-system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
-
-# larger dataset
-plan(sequential)
-plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 2)))
-system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
