@@ -99,27 +99,103 @@ main <- function(portfolio, indicators, dem_url){
 }
 
 
-# execute in sequence and parallel
-# plan(list(tweak(multisession, workers = 2), tweak(multisession, workers = 3)))
+main <- function(portfolio, indicators, dem_url){
+  future_map_dfr(indicators,
+                 function(indicator, portfolio, dem_url){
+                   fun <- switch(indicator,
+                                 "dem" = dem_mean,
+                                 "tri" = tri_mean)
+                   portfolio <- portfolio |> 
+                     dplyr::group_split(id)
+                   result <- future_map_dfr(portfolio,
+                                            function(poly, fun, dem_url){
+                                              fun(poly, dem_url)
+                                            }, fun, dem_url)
+                   result$parent.id <- Sys.getpid()
+                   result
+                 }, portfolio, dem_url, .options=furrr_options(
+                   packages = c("terra", "sf")
+                 )
+  )
+}
+
+
 plan(sequential)
 system.time(out <- main(aois, c("dem", "tri"), dem_url))
-#>    user  system elapsed 
-#>   1.347   0.061  26.588
-plan(list(tweak(cluster, workers = 8), tweak(cluster, workers = 8)))
+# user  system elapsed 
+# 2.547   0.650  19.507 
+plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 4)))
 system.time(out <- main(aois, c("dem", "tri"), dem_url))
-out
-#> # A tibble: 12 × 4
-#>    parameter   value child.pid parent.id
-#>    <chr>       <dbl>     <int>     <int>
-#>  1 dem        814.       14746     14630
-#>  2 dem       2522.       14746     14630
-#>  3 dem        574.       14748     14630
-#>  4 dem       1506.       14748     14630
-#>  5 dem        883.       14747     14630
-#>  6 dem       1061.       14747     14630
-#>  7 tri          3.05     14902     14631
-#>  8 tri          7.92     14902     14631
-#>  9 tri          4.62     14901     14631
-#> 10 tri          4.51     14901     14631
-#> 11 tri          3.96     14903     14631
-#> 12 tri          6.62     14903     14631
+# user  system elapsed 
+# 2.559   0.332  36.415 
+
+
+# Now let's try with more assets
+many_aois <- bind_rows(replicate(10, aois, simplify = FALSE))
+many_aois$id <- 1:nrow(many_aois)
+
+plan(sequential)
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 21.570   5.551 191.902 
+
+plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 4)))
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 4.689   0.360  57.267 
+
+## TWEAK PLAN ---------------------------------
+
+plan(sequential)
+plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 4)))
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 5.589   0.565  67.473 
+
+plan(sequential)
+plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 2)))
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 5.983   0.600  73.072 
+
+plan(sequential)
+plan(cluster, workers = 4)
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 9.946   0.926 109.158 
+
+plan(sequential)
+plan(cluster, workers = 8)
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 6.725   0.770  74.830 
+
+plan(sequential)
+plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 8)))
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 6.459   0.846  70.975
+
+plan(sequential)
+plan(list(tweak(multisession, workers = 4), tweak(multisession, workers = 4)))
+system.time(out <- main(many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 5.064   0.410  61.576 
+
+## END TWEAK PLAN --------------------------------
+
+# Now let's try with more assets
+very_many_aois <- bind_rows(replicate(100, aois, simplify = FALSE))
+very_many_aois$id <- 1:nrow(very_many_aois)
+
+plan(sequential)
+plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 4)))
+system.time(out <- main(very_many_aois, c("dem", "tri"), dem_url))
+# user  system elapsed 
+# 29.505   2.516 311.656
+
+
+
+plan(sequential)
+plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 4)))
+system.time(out <- main2(many_aois, c("dem", "tri"), dem_url))
