@@ -1,3 +1,4 @@
+install.packages(c("future", "furrr"))
 library(terra)
 library(sf)
 library(future)
@@ -113,12 +114,14 @@ aois_stack <- list(aois_6, aois_60, aois_600)
 # Using for loops on purpose to avoid confusion with vectorized execution
 for (i in 1:length(plans$plan)) {
   for (j in 1:3) {
-    eval(parse(text = plans$plan[i]))
+#    eval(parse(text = plans$plan[i]))
+print(i)
+print(j)
     print(paste("evaluate", aois_n[j], "with", plans$plan[i]))
  #   my_poly <- eval(parse(polys[j]))
-    elapsed <- system.time(main(aois_stack[[j]], 
-                                c("dem", "tri"), dem_url))[["elapsed"]]
-    plans[i, aois_n[j]] <- elapsed 
+#    elapsed <- system.time(main(aois_stack[[j]], 
+#                                c("dem", "tri"), dem_url))[["elapsed"]]
+#    plans[i, aois_n[j]] <- elapsed 
   }
 }
 
