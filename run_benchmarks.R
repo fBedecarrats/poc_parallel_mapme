@@ -106,7 +106,7 @@ plans <- tribble(
   3,         8,
   4,         6)
 
-plans2 <- plans %>%
+plans <- plans %>%
   mutate(plan = case_when(
     !is.na(workers2) ~ paste0("plan(list(tweak(cluster, workers = ", 
                               workers1,
@@ -127,8 +127,6 @@ aois_stack <- list(aois_6, aois_60, aois_600)
 for (i in 1:length(plans$plan)) {
   for (j in 1:3) {
 #    eval(parse(text = plans$plan[i]))
-print(i)
-print(j)
     print(paste("evaluate", aois_n[j], "with", plans$plan[i]))
     my_poly <- eval(parse(polys[j]))
     elapsed <- system.time(main(aois_stack[[j]],
@@ -136,5 +134,6 @@ print(j)
     plans[i, aois_n[j]] <- elapsed
   }
 }
+
 
 write_csv(plans, "benchmark_outputs.csv")
