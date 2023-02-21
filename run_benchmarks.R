@@ -89,21 +89,33 @@ aois_60$id <- 1:nrow(aois_60)
 aois_600 <- bind_rows(replicate(100, aois_6, simplify = FALSE))
 aois_600$id <- 1:nrow(aois_600)
 
-plans <- tibble(workers = list(2,
-                               4, c(2,2),
-                               8, c(2, 4), c(4,2),
-                               16, c(4, 4), c(2, 8), c(8,2),
-                               24, c(2, 12), c(3, 8), c(4,6))) %>%
-  mutate(levels_parallel = lengths(workers),
-         plan = case_when(
-           levels_parallel == 2 ~ paste0("plan(list(tweak(cluster, workers = ", 
-                                         workers[1],
-                                         "), tweak(cluster, workers = ",
-                                         workers[2],")))"),
-           levels_parallel == 1 ~ paste0("plan(cluster, workers = ", workers,")"))) %>% 
+plans <- tribble(
+  ~workers1, ~workers2,
+  2,         NA,
+  4,         NA,
+  2,         2,
+  8,         NA,
+  2,         4,
+  4,         2,
+  16,        NA,
+  4,         4,
+  2,         8,
+  8,         2,
+  24,        NA,
+  2,         12,
+  3,         8,
+  4,         6)
+
+plans2 <- plans %>%
+  mutate(plan = case_when(
+    !is.na(workers2) ~ paste0("plan(list(tweak(cluster, workers = ", 
+                              workers1,
+                              "), tweak(cluster, workers = ",
+                              workers2,")))"),
+    is.na(workers2) ~ paste0("plan(cluster, workers = ", workers1,")"))) %>% 
   bind_rows(mutate(., plan = str_replace(plan, "cluster", "multicore")),
             mutate(., plan = str_replace(plan, "cluster", "multisession"))) %>%
-  add_row(workers = list(1), levels_parallel = 1, plan = "plan(sequential)")
+  add_row(workers1 = 1, workers2 = NA, plan = "plan(sequential)")
 
 # name of aoi portfolios
 aois_n <- c("aois_6", "aois_60", "aois_600")
@@ -118,10 +130,10 @@ for (i in 1:length(plans$plan)) {
 print(i)
 print(j)
     print(paste("evaluate", aois_n[j], "with", plans$plan[i]))
- #   my_poly <- eval(parse(polys[j]))
-#    elapsed <- system.time(main(aois_stack[[j]], 
-#                                c("dem", "tri"), dem_url))[["elapsed"]]
-#    plans[i, aois_n[j]] <- elapsed 
+    my_poly <- eval(parse(polys[j]))
+    elapsed <- system.time(main(aois_stack[[j]],
+                                c("dem", "tri"), dem_url))[["elapsed"]]
+    plans[i, aois_n[j]] <- elapsed
   }
 }
 
