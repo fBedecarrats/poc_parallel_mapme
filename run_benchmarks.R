@@ -128,7 +128,6 @@ for (i in 1:length(plans$plan)) {
   for (j in 1:3) {
 #    eval(parse(text = plans$plan[i]))
     print(paste("evaluate", aois_n[j], "with", plans$plan[i]))
-    my_poly <- eval(parse(polys[j]))
     elapsed <- system.time(main(aois_stack[[j]],
                                 c("dem", "tri"), dem_url))[["elapsed"]]
     plans[i, aois_n[j]] <- elapsed
