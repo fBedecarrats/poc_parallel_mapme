@@ -1,9 +1,8 @@
 library(terra)
 library(sf)
 library(future)
-library(tibble)
-library(dplyr)
 library(furrr)
+library(tidyverse)
 
 # construct globally distributed polygons
 aois_6 <- c(
