@@ -1,0 +1,44 @@
+workers1,workers2,plan,aois_6,aois_60,aois_600
+2,NA,"plan(cluster, workers = 2)",14.651000000000295,131.27199999999993,1505.529
+4,NA,"plan(cluster, workers = 4)",13.443000000000211,205.26900000000023,1198.3189999999995
+2,2,"plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 2)))",12.778999999999542,103.89399999999932,1189.1319999999996
+8,NA,"plan(cluster, workers = 8)",11.791999999999462,134.4930000000004,1323.085
+2,4,"plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 4)))",14.682999999999993,144.35800000000017,1343.446
+4,2,"plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 2)))",9.477000000000771,89.53499999999985,1060.4249999999993
+16,NA,"plan(cluster, workers = 16)",11.270000000000437,124.30299999999988,1155.2080000000005
+4,4,"plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 4)))",16.502000000000407,147.36100000000079,2062.268
+2,8,"plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 8)))",27.876000000000204,215.64500000000044,2297.5610000000015
+8,2,"plan(list(tweak(cluster, workers = 8), tweak(cluster, workers = 2)))",13.43999999999869,135.15899999999965,1663.3019999999997
+24,NA,"plan(cluster, workers = 24)",17.65299999999843,167.59299999999712,1627.8189999999995
+2,12,"plan(list(tweak(cluster, workers = 2), tweak(cluster, workers = 12)))",16.751000000000204,170.6339999999982,1454.9020000000019
+3,8,"plan(list(tweak(cluster, workers = 3), tweak(cluster, workers = 8)))",16.51599999999962,182.21799999999712,1834.6970000000001
+4,6,"plan(list(tweak(cluster, workers = 4), tweak(cluster, workers = 6)))",15.694000000003143,151.507999999998,1544.8349999999991
+2,NA,"plan(multicore, workers = 2)",12.509000000001834,126.70799999999872,1582.9169999999976
+4,NA,"plan(multicore, workers = 4)",16.756000000001222,159.16300000000047,1128.214
+2,2,"plan(list(tweak(multicore, workers = 2), tweak(cluster, workers = 2)))",9.938999999998487,113.34200000000055,1292.0449999999983
+8,NA,"plan(multicore, workers = 8)",14.380000000001019,153.52699999999822,1537.2029999999977
+2,4,"plan(list(tweak(multicore, workers = 2), tweak(cluster, workers = 4)))",17.495999999999185,163.98600000000079,1270.393
+4,2,"plan(list(tweak(multicore, workers = 4), tweak(cluster, workers = 2)))",13.101000000002387,139.46899999999732,1681.9339999999938
+16,NA,"plan(multicore, workers = 16)",14.005999999993946,227.69399999999587,1270.5820000000022
+4,4,"plan(list(tweak(multicore, workers = 4), tweak(cluster, workers = 4)))",16.362999999997555,145.903999999995,1416.9910000000018
+2,8,"plan(list(tweak(multicore, workers = 2), tweak(cluster, workers = 8)))",14.258999999998196,142.72699999999895,1353.9939999999988
+8,2,"plan(list(tweak(multicore, workers = 8), tweak(cluster, workers = 2)))",8.788000000000466,89.61899999999878,1221.351999999999
+24,NA,"plan(multicore, workers = 24)",9.679000000003725,98.20300000000134,1110.0290000000023
+2,12,"plan(list(tweak(multicore, workers = 2), tweak(cluster, workers = 12)))",13.442999999999302,139.85400000000664,1031.377999999997
+3,8,"plan(list(tweak(multicore, workers = 3), tweak(cluster, workers = 8)))",10.689999999995052,108.18899999999849,1462.7490000000034
+4,6,"plan(list(tweak(multicore, workers = 4), tweak(cluster, workers = 6)))",15.514000000002852,153.75100000000384,1310.173999999999
+2,NA,"plan(multisession, workers = 2)",11.957000000002154,117.34700000000157,1347.5400000000009
+4,NA,"plan(multisession, workers = 4)",13.432000000000698,134.79000000000087,1375.8610000000044
+2,2,"plan(list(tweak(multisession, workers = 2), tweak(cluster, workers = 2)))",12.976000000002387,124.32600000000093,981.9059999999954
+8,NA,"plan(multisession, workers = 8)",13.135999999998603,128.22299999999814,1325.6680000000051
+2,4,"plan(list(tweak(multisession, workers = 2), tweak(cluster, workers = 4)))",14.400000000001455,134.38100000000122,1422.4490000000005
+4,2,"plan(list(tweak(multisession, workers = 4), tweak(cluster, workers = 2)))",12.572000000000116,144.32999999999447,1425.104999999996
+16,NA,"plan(multisession, workers = 16)",15.986999999993714,145.17199999999866,1367.773000000001
+4,4,"plan(list(tweak(multisession, workers = 4), tweak(cluster, workers = 4)))",16.13499999999476,154.61499999999796,1328.676999999996
+2,8,"plan(list(tweak(multisession, workers = 2), tweak(cluster, workers = 8)))",12.09599999999773,125.45499999999447,1247.8719999999958
+8,2,"plan(list(tweak(multisession, workers = 8), tweak(cluster, workers = 2)))",13.112999999997555,129.87799999999697,1405.7279999999955
+24,NA,"plan(multisession, workers = 24)",14.773000000001048,147.7260000000024,1459.7160000000003
+2,12,"plan(list(tweak(multisession, workers = 2), tweak(cluster, workers = 12)))",15.855999999999767,140.45999999999913,1857.5110000000059
+3,8,"plan(list(tweak(multisession, workers = 3), tweak(cluster, workers = 8)))",15.47099999999773,153.65800000000309,1282.9330000000045
+4,6,"plan(list(tweak(multisession, workers = 4), tweak(cluster, workers = 6)))",13.548999999999069,137.49700000000303,1434.0219999999972
+1,NA,plan(sequential),13.5740000000078,136.57600000000093,1356.099000000002
