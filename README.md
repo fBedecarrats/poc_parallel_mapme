@@ -8,5 +8,10 @@ It was tested on SSP Cloud platforms, with 2 different containers:
 The tests on R + RStudio were run with poc_alternative.R (which doesn't include multicore strategies, as advised for the future package on RStudio platforms.
 The tests on R + VSCode aimed at including multicore but produced surprising results (no gains from paralellization).
 
-Below are the results.
+First results w. RStudio   
 
+![histogram with results on rsudio](https://user-images.githubusercontent.com/3328347/222668887-707a3413-2880-4fd7-b1f2-81c7f1c058d2.png)
+
+First results w. VSCode   
+
+![histogram with results on vscode](https://raw.githubusercontent.com/fBedecarrats/poc_parallel_mapme/main/Results%20VSCode.png)
